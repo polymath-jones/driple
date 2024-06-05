@@ -2,12 +2,12 @@
 
 export function initCollection({
   dbName,
-  objectStoreName,
+  objectStoreNames,
   keyPath,
   indexes,
 }: {
   dbName: string;
-  objectStoreName: string;
+  objectStoreNames: string[];
   keyPath?: string;
   indexes?: {
     name: string;
@@ -18,14 +18,17 @@ export function initCollection({
   const request = indexedDB.open(dbName, 1);
   request.onupgradeneeded = (event) => {
     const db = (event?.target as IDBOpenDBRequest)?.result;
-    const objectStore = db.createObjectStore(objectStoreName, {
-      keyPath: keyPath ?? "_id",
-      autoIncrement: false,
-    });
 
-    indexes?.forEach(({ name, keyPath: keyPaths, unique }) => {
-      objectStore.createIndex(name, keyPaths, { unique });
-    });
+    for (const objectStoreName of objectStoreNames) {
+      const objectStore = db.createObjectStore(objectStoreName, {
+        keyPath: keyPath ?? "_id",
+        autoIncrement: false,
+      });
+
+      indexes?.forEach(({ name, keyPath: keyPaths, unique }) => {
+        objectStore.createIndex(name, keyPaths, { unique });
+      });
+    }
   };
 }
 
@@ -47,8 +50,8 @@ export async function pushToCollection<T>(
       transaction1.oncomplete = () => {
         resolve();
       };
-      transaction1.onerror = () => {
-        reject();
+      transaction1.onerror = (e) => {
+        reject(e);
       };
     };
   });

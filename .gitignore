@@ -9,6 +9,8 @@
 # testing
 /coverage
 
+/public/plugins
+
 # next.js
 /.next/
 /out/
