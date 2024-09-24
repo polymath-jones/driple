@@ -9,7 +9,7 @@
 # testing
 /coverage
 
-/public/plugins
+/public/plugins/gain/processor/zig-cache
 
 # next.js
 /.next/
